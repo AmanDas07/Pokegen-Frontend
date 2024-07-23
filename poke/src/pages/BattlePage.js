@@ -201,7 +201,7 @@ const BattlePage = () => {
                                     <CloseIcon />
                                 </IconButton>
                                 <Box display="flex" justifyContent="center" alignItems="center" marginBottom={1} marginTop={0}>
-                                    <img src={modalData.image} alt={modalData.Pokemon} style={{ padding: 0, width: '60%', height: '60%', borderRadius: 2 }} />
+                                    <img src={modalData.image} alt={modalData.Pokemon} style={{ padding: 0, width: '60%', height: '50%', borderRadius: 2 }} />
                                 </Box>
                                 <Box sx={{ padding: 0, marginBottom: 0, borderBottom: '1px solid #ddd', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <Typography variant="subtitle1" align="center" fontSize="1.25rem"><strong>{modalData.Pokemon}</strong></Typography>
