@@ -86,16 +86,117 @@ const flicker = keyframes`
 
 const FlickerText = styled(Typography)`
   font-family: "Fira Mono", monospace;
-  font-weight: 700;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.2ch;
-  font-size: 10vw;
+  font-size: 5vw; 
   line-height: 1;
   color: #ffcc00;
   animation: ${flicker} 3s linear infinite;
   margin: 0 16px;
 `;
 
+const PokeballButton = styled(Button)`
+  position: relative;
+  padding: 15px 30px 15px 70px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #FF0000;
+  background-color: transparent;
+  border: 2px solid #FF0000;
+  border-radius: 30px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: white;
+  }
+
+  &:hover::before {
+    width: 100%;
+  }
+
+  &:active::before {
+    background-color: #333;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background-color: #FF0000;
+    transition: width 0.3s ease;
+    z-index: -1;
+  }
+`;
+
+const Pokeball = styled('div')`
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(to bottom, #EE1515 0%, #EE1515 48%, #000 48%, #000 52%, #fff 52%, #fff 100%);
+  border-radius: 50%;
+  border: 2px solid #000;
+  box-shadow: inset -3px 3px 0 rgba(255, 255, 255, 0.3);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    background-color: #fff;
+    border-radius: 50%;
+    border: 2px solid #000;
+    transform: translate(-50%, -50%);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    background-color: #fff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+
+
+    
+  }
+`;
+
+
+const TransparentCard = styled(Card)`
+  background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent background */
+  border: 2px dashed #FF0000; /* Red dashed border */
+  padding: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 200px; /* Adjust the height as needed */
+  width: 200px; /* Adjust the width as needed */
+`;
+
+
+
+const AddSign = styled(Typography)`
+  font-size: 10rem;
+  font-weight: bold;
+  color: #FF0000;
+  text-align: center;
+`;
 const BattlePage = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalData, setModalData] = useState(null);
@@ -151,39 +252,46 @@ const BattlePage = () => {
             >
                 <Typography variant="h4" align="center" gutterBottom>Pokémon Battle</Typography>
                 <Box display="flex" justifyContent="center" alignItems="center">
-                    <Card onClick={() => handleCardClick('Pokemon1')} sx={{ margin: 2, padding: 2, cursor: 'pointer', boxShadow: 3, borderRadius: 2 }}>
+                    <TransparentCard onClick={() => handleCardClick('Pokemon1')} sx={{ margin: 2, padding: 2, cursor: 'pointer', boxShadow: 3, borderRadius: 2 }}>
                         <CardContent>
                             {selectedPokemon1 ? (
                                 <>
                                     <Typography variant="h5" align="center">{selectedPokemon1.Pokemon}</Typography>
                                     <Box display="flex" justifyContent="center">
-                                        <img src={selectedPokemon1.image} alt={selectedPokemon1.Pokemon} style={{ width: '30%', borderRadius: 2 }} />
+                                        <img src={selectedPokemon1.image} alt={selectedPokemon1.Pokemon} style={{ width: '100%', borderRadius: 2 }} />
                                     </Box>
                                 </>
                             ) : (
-                                <Typography variant="h5" align="center">Select Pokémon 1</Typography>
+                                <AddSign>+</AddSign>
                             )}
                         </CardContent>
-                    </Card>
+                    </TransparentCard>
 
-                    <FlickerText>VS</FlickerText>
+                    <FlickerText>vs</FlickerText>
 
-                    <Card onClick={() => handleCardClick('Pokemon2')} sx={{ margin: 2, padding: 2, cursor: 'pointer', boxShadow: 3, borderRadius: 2 }}>
+                    <TransparentCard onClick={() => handleCardClick('Pokemon2')} sx={{ margin: 2, padding: 2, cursor: 'pointer', boxShadow: 3, borderRadius: 2 }}>
                         <CardContent>
                             {selectedPokemon2 ? (
                                 <>
                                     <Typography variant="h5" align="center">{selectedPokemon2.Pokemon}</Typography>
                                     <Box display="flex" justifyContent="center">
-                                        <img src={selectedPokemon2.image} alt={selectedPokemon2.Pokemon} style={{ width: '30%', borderRadius: 2 }} />
+                                        <img src={selectedPokemon2.image} alt={selectedPokemon2.Pokemon} style={{ width: '60%', borderRadius: 2 }} />
                                     </Box>
                                 </>
                             ) : (
-                                <Typography variant="h5" align="center">Select Pokémon 2</Typography>
+
+                                <AddSign>+</AddSign>
+
                             )}
                         </CardContent>
-                    </Card>
+                    </TransparentCard>
                 </Box>
-
+                <Box display="flex" justifyContent="center" mt={2}>
+                    <PokeballButton>
+                        <Pokeball />
+                        Start Battle
+                    </PokeballButton>
+                </Box>
                 <Modal open={modalOpen} onClose={handleClose}>
                     <Box sx={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)', position: 'absolute', width: '90%', maxWidth: 300, height: '59vh', bgcolor: '#FFD700', padding: 2, boxShadow: 24, borderRadius: 6, overflowY: 'auto' }}>
                         {modalData && (
@@ -270,3 +378,14 @@ const BattlePage = () => {
 };
 
 export default BattlePage;
+
+
+
+
+
+
+/*
+
+
+
+*/
