@@ -177,16 +177,18 @@ const Pokeball = styled('div')`
 
 
 const TransparentCard = styled(Card)`
-  background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent background */
-  border: 2px dashed #FF0000; /* Red dashed border */
+  background-color: rgba(255, 255, 255, 0.5); 
+  border: 2px dashed black;
   padding: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  height: 200px; /* Adjust the height as needed */
-  width: 200px; /* Adjust the width as needed */
+  height: 200px; 
+  width: 200px; 
+
+ 
 `;
 
 
@@ -194,8 +196,8 @@ const TransparentCard = styled(Card)`
 const AddSign = styled(Typography)`
   font-size: 10rem;
   font-weight: bold;
-  color: #FF0000;
-  text-align: center;
+  color: rgba(0, 0, 0, 0.5);
+  text-align: center; 
 `;
 const BattlePage = () => {
     const [modalOpen, setModalOpen] = useState(false);
