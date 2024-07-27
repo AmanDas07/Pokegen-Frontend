@@ -146,6 +146,7 @@ const BattlePage = () => {
     const [selectedPokemon2, setSelectedPokemon2] = useState(null);
     const [pokemonList, setPokemonList] = useState([]);
     const [currentPokemonIndex, setCurrentPokemonIndex] = useState(0);
+    const [selectedCard, setSelectedCard] = useState(null);
 
     useEffect(() => {
         const fetchPokemonData = async () => {
@@ -162,9 +163,10 @@ const BattlePage = () => {
         fetchPokemonData();
     }, []);
 
-    const handleCardClick = (pokemonKey) => {
+    const handleCardClick = (pokemonKey, card) => {
         setCurrentPokemonIndex(pokemonKey);
         setModalData(pokemonList[pokemonKey]);
+        setSelectedCard(card);
         setModalOpen(true);
     };
 
@@ -173,6 +175,15 @@ const BattlePage = () => {
     const toggleShowStats = () => {
         setShowStats(!showStats);
     };
+    const handleSelect = () => {
+        if (selectedCard === 1) {
+            setSelectedPokemon1(modalData);
+        } else if (selectedCard === 2) {
+            setSelectedPokemon2(modalData);
+        }
+        handleClose();
+    };
+
 
     const handlePreviousPokemon = () => {
         const previousIndex = currentPokemonIndex === 0 ? pokemonList.length - 1 : currentPokemonIndex - 1;
@@ -214,7 +225,7 @@ const BattlePage = () => {
             >
 
                 <Box display="flex" justifyContent="center" alignItems="center">
-                    <TransparentCard onClick={() => handleCardClick(0)} sx={{ margin: 2, padding: 2, cursor: 'pointer', boxShadow: 3, borderRadius: 2 }}>
+                    <TransparentCard onClick={() => handleCardClick(0, 1)} sx={{ margin: 2, padding: 2, cursor: 'pointer', boxShadow: 3, borderRadius: 2 }}>
                         <CardContent>
                             {selectedPokemon1 ? (
                                 <>
@@ -231,7 +242,7 @@ const BattlePage = () => {
 
                     <FlickerText>vs</FlickerText>
 
-                    <TransparentCard onClick={() => handleCardClick(1)} sx={{ margin: 2, padding: 2, cursor: 'pointer', boxShadow: 3, borderRadius: 2 }}>
+                    <TransparentCard onClick={() => handleCardClick(1, 2)} sx={{ margin: 2, padding: 2, cursor: 'pointer', boxShadow: 3, borderRadius: 2 }}>
                         <CardContent>
                             {selectedPokemon2 ? (
                                 <>
@@ -333,6 +344,7 @@ const BattlePage = () => {
                                         </Box>
                                     </>
                                 )}
+                                <Button variant="contained" color="primary" fullWidth sx={{ marginTop: 1.5, fontSize: '0.75rem', borderRadius: '16px', padding: '6px 12px' }} onClick={handleSelect}>Select</Button>
                             </>
                         )}
                     </Box>
@@ -343,19 +355,3 @@ const BattlePage = () => {
 };
 
 export default BattlePage;
-
-
-/*  <svg viewBox="0 0 800 250">
-                  <symbol id="s-text">
-                      <text text-anchor="middle" x="50%" y="50%" dy=".35em">
-                          Pokemon Battle
-                      </text>
-                  </symbol>
-                  <use className="text" xlinkHref="#s-text"></use>
-                  <use className="text" xlinkHref="#s-text"></use>
-                  <use className="text" xlinkHref="#s-text"></use>
-                  <use className="text" xlinkHref="#s-text"></use>
-                  <use className="text" xlinkHref="#s-text"></use>
-              </svg>*/
-
-// <img src={`data:image/png;base64,${selectedPokemon1.image}`} alt={selectedPokemon1.Pokemon} style={{ width: '100%', borderRadius: 2 }} />
