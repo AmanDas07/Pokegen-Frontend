@@ -22,18 +22,19 @@ const Root = styled('div')(({ theme }) => ({
         flexGrow: 1,
     },
     [`& .${classes.button}`]: {
-        marginLeft: theme.spacing(2),
-        fontSize: '1.25rem',
+        marginLeft: theme.spacing(1),
+        fontSize: '1rem',
+        padding: theme.spacing(1, 2),
     },
     [`& .MuiSvgIcon-root`]: {
-        fontSize: '1.5rem',
+        fontSize: '1.25rem',
     },
     [`& .${classes.toolbar}`]: {
-        minHeight: '128px',
+        minHeight: '64px',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingBottom: theme.spacing(2),
-        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(1),
+        paddingTop: theme.spacing(1),
     }
 }));
 
@@ -43,7 +44,7 @@ function Header() {
             <AppBar position="static" style={{ backgroundColor: '#18121c', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)' }}>
                 <Toolbar className={classes.toolbar}>
                     <Box display="flex" alignItems="center">
-                        <img src="https://i.ibb.co/cgJzxdC/41acc10d-609a-4b8c-96e7-a0b851a531a8-1.jpg" title='POKEGEN' style={{ width: '50%', maxWidth: '150px', marginRight: '16px' }} />
+                        <img src="https://i.ibb.co/cgJzxdC/41acc10d-609a-4b8c-96e7-a0b851a531a8-1.jpg" title='POKEGEN' style={{ width: '50%', maxWidth: '120px', marginRight: '8px' }} />
                     </Box>
                     <Box>
                         <Button color="inherit" startIcon={<BattleIcon />} className={classes.button}>Battle</Button>
