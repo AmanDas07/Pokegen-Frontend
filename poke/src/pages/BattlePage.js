@@ -1,67 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Box, Typography, Card, CardContent, Button, Modal, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import InfoIcon from '@mui/icons-material/Info';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { keyframes } from '@emotion/react';
 import { styled } from '@mui/system';
 import Layout from './Layout';
-
-const pokemonData = {
-    "Pokemon1": {
-        "Abilities": ["Intimidate", "Flash Fire, Justified (hidden ability)"],
-        "Attack": 110,
-        "Attack Max": 350,
-        "Attack Min": 202,
-        "Defense": 80,
-        "Defense Max": 284,
-        "Defense Min": 148,
-        "HP": 90,
-        "HP Max": 384,
-        "HP Min": 290,
-        "Height": 1.9,
-        "Pokemon": "Arcanine",
-        "Simplified Type": "Fire",
-        "Special Attack": 100,
-        "Special Attack Max": 328,
-        "Special Attack Min": 184,
-        "Special Defense": 80,
-        "Special Defense Max": 284,
-        "Special Defense Min": 148,
-        "Speed": 95,
-        "Speed Max": 317,
-        "Speed Min": 175,
-        "Type": ["Fire"],
-        "Weight": 155.0,
-        "image": "https://svgshare.com/i/18XU.svg"
-    },
-    "Pokemon2": {
-        "Abilities": ["Flash Fire, Weak Armor (hidden ability)"],
-        "Attack": 60,
-        "Attack Max": 240,
-        "Attack Min": 112,
-        "Defense": 100,
-        "Defense Max": 328,
-        "Defense Min": 184,
-        "HP": 85,
-        "HP Max": 374,
-        "HP Min": 280,
-        "Height": 1.5,
-        "Pokemon": "Armarouge",
-        "Simplified Type": "Fire",
-        "Special Attack": 125,
-        "Special Attack Max": 383,
-        "Special Attack Min": 229,
-        "Special Defense": 80,
-        "Special Defense Max": 284,
-        "Special Defense Min": 148,
-        "Speed": 75,
-        "Speed Max": 273,
-        "Speed Min": 139,
-        "Type": ["Fire", "Psychic"],
-        "Weight": 85.0,
-        "image": "https://img.pokemondb.net/artwork/large/armarouge.jpg"
-    }
-};
+import axios from 'axios';
 
 const flicker = keyframes`
   0%, 19.9%, 22%, 62.9%, 64%, 64.9%, 70%, 100% {
@@ -169,12 +115,8 @@ const Pokeball = styled('div')`
     background-color: #fff;
     border-radius: 50%;
     transform: translate(-50%, -50%);
-
-
-    
   }
 `;
-
 
 const TransparentCard = styled(Card)`
   background-color: rgba(255, 255, 255, 0.5); 
@@ -187,11 +129,7 @@ const TransparentCard = styled(Card)`
   position: relative;
   height: 200px; 
   width: 200px; 
-
- 
 `;
-
-
 
 const AddSign = styled(Typography)`
   font-size: 10rem;
@@ -199,15 +137,34 @@ const AddSign = styled(Typography)`
   color: rgba(0, 0, 0, 0.5);
   text-align: center; 
 `;
+
 const BattlePage = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalData, setModalData] = useState(null);
     const [showStats, setShowStats] = useState(true);
     const [selectedPokemon1, setSelectedPokemon1] = useState(null);
     const [selectedPokemon2, setSelectedPokemon2] = useState(null);
+    const [pokemonList, setPokemonList] = useState([]);
+    const [currentPokemonIndex, setCurrentPokemonIndex] = useState(0);
+
+    useEffect(() => {
+        const fetchPokemonData = async () => {
+            try {
+                const response = await axios.post('https://pokegen.onrender.com/top_count');
+                setPokemonList(response.data);
+                console.log(response.data);
+                setModalData(response.data[0]);
+            } catch (error) {
+                console.error('Error fetching Pokémon data:', error);
+            }
+        };
+
+        fetchPokemonData();
+    }, []);
 
     const handleCardClick = (pokemonKey) => {
-        setModalData(pokemonData[pokemonKey]);
+        setCurrentPokemonIndex(pokemonKey);
+        setModalData(pokemonList[pokemonKey]);
         setModalOpen(true);
     };
 
@@ -217,13 +174,16 @@ const BattlePage = () => {
         setShowStats(!showStats);
     };
 
-    const handleSelect = () => {
-        if (modalData.Pokemon === 'Arcanine') {
-            setSelectedPokemon1(modalData);
-        } else {
-            setSelectedPokemon2(modalData);
-        }
-        handleClose();
+    const handlePreviousPokemon = () => {
+        const previousIndex = currentPokemonIndex === 0 ? pokemonList.length - 1 : currentPokemonIndex - 1;
+        setCurrentPokemonIndex(previousIndex);
+        setModalData(pokemonList[previousIndex]);
+    };
+
+    const handleNextPokemon = () => {
+        const nextIndex = currentPokemonIndex === pokemonList.length - 1 ? 0 : currentPokemonIndex + 1;
+        setCurrentPokemonIndex(nextIndex);
+        setModalData(pokemonList[nextIndex]);
     };
 
     return (
@@ -252,9 +212,9 @@ const BattlePage = () => {
                     }
                 }}
             >
-                <Typography variant="h4" align="center" gutterBottom>Pokémon Battle</Typography>
+
                 <Box display="flex" justifyContent="center" alignItems="center">
-                    <TransparentCard onClick={() => handleCardClick('Pokemon1')} sx={{ margin: 2, padding: 2, cursor: 'pointer', boxShadow: 3, borderRadius: 2 }}>
+                    <TransparentCard onClick={() => handleCardClick(0)} sx={{ margin: 2, padding: 2, cursor: 'pointer', boxShadow: 3, borderRadius: 2 }}>
                         <CardContent>
                             {selectedPokemon1 ? (
                                 <>
@@ -271,7 +231,7 @@ const BattlePage = () => {
 
                     <FlickerText>vs</FlickerText>
 
-                    <TransparentCard onClick={() => handleCardClick('Pokemon2')} sx={{ margin: 2, padding: 2, cursor: 'pointer', boxShadow: 3, borderRadius: 2 }}>
+                    <TransparentCard onClick={() => handleCardClick(1)} sx={{ margin: 2, padding: 2, cursor: 'pointer', boxShadow: 3, borderRadius: 2 }}>
                         <CardContent>
                             {selectedPokemon2 ? (
                                 <>
@@ -281,9 +241,7 @@ const BattlePage = () => {
                                     </Box>
                                 </>
                             ) : (
-
                                 <AddSign>+</AddSign>
-
                             )}
                         </CardContent>
                     </TransparentCard>
@@ -310,8 +268,14 @@ const BattlePage = () => {
                                 >
                                     <CloseIcon />
                                 </IconButton>
-                                <Box display="flex" justifyContent="center" alignItems="center" marginBottom={1} marginTop={0}>
+                                <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={1} marginTop={0}>
+                                    <IconButton onClick={handlePreviousPokemon}>
+                                        <ArrowBackIosIcon />
+                                    </IconButton>
                                     <img src={modalData.image} alt={modalData.Pokemon} style={{ padding: 0, width: '60%', height: '50%', borderRadius: 2 }} />
+                                    <IconButton onClick={handleNextPokemon}>
+                                        <ArrowForwardIosIcon />
+                                    </IconButton>
                                 </Box>
                                 <Box sx={{ padding: 0, marginBottom: 0, borderBottom: '1px solid #ddd', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <Typography variant="subtitle1" align="center" fontSize="1.25rem"><strong>{modalData.Pokemon}</strong></Typography>
@@ -369,7 +333,6 @@ const BattlePage = () => {
                                         </Box>
                                     </>
                                 )}
-                                <Button variant="contained" color="primary" fullWidth sx={{ marginTop: 1.5, fontSize: '0.75rem', borderRadius: '16px', padding: '6px 12px' }} onClick={handleSelect}>Select</Button>
                             </>
                         )}
                     </Box>
@@ -382,12 +345,17 @@ const BattlePage = () => {
 export default BattlePage;
 
 
+/*  <svg viewBox="0 0 800 250">
+                  <symbol id="s-text">
+                      <text text-anchor="middle" x="50%" y="50%" dy=".35em">
+                          Pokemon Battle
+                      </text>
+                  </symbol>
+                  <use className="text" xlinkHref="#s-text"></use>
+                  <use className="text" xlinkHref="#s-text"></use>
+                  <use className="text" xlinkHref="#s-text"></use>
+                  <use className="text" xlinkHref="#s-text"></use>
+                  <use className="text" xlinkHref="#s-text"></use>
+              </svg>*/
 
-
-
-
-/*
-
-
-
-*/
+// <img src={`data:image/png;base64,${selectedPokemon1.image}`} alt={selectedPokemon1.Pokemon} style={{ width: '100%', borderRadius: 2 }} />
