@@ -8,7 +8,7 @@ import { keyframes } from '@emotion/react';
 import { styled } from '@mui/system';
 import Layout from './Layout';
 import axios from 'axios';
-
+import './styles.css'
 const flicker = keyframes`
   0%, 19.9%, 22%, 62.9%, 64%, 64.9%, 70%, 100% {
     opacity: 0.99;
@@ -41,6 +41,21 @@ const FlickerText = styled(Typography)`
   animation: ${flicker} 3s linear infinite;
   margin: 0 16px;
 `;
+
+const Header = styled('h1')`
+  font-family: 'Press Start 2P', cursive;
+  font-size: 3rem;
+  text-align: center;
+  color: #ffcc00;
+  background: linear-gradient(to right, #ff7e00, #ffcc00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+`;
+
+
 
 const PokeballButton = styled(Button)`
   position: relative;
@@ -223,6 +238,7 @@ const BattlePage = () => {
                     }
                 }}
             >
+                <Header>Pokemon Battle</Header>
 
                 <Box display="flex" justifyContent="center" alignItems="center">
                     <TransparentCard onClick={() => handleCardClick(0, 1)} sx={{ margin: 2, padding: 2, cursor: 'pointer', boxShadow: 3, borderRadius: 2 }}>
