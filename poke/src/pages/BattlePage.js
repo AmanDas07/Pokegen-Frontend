@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Box, Typography, Card, CardContent, Button, Modal, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import InfoIcon from '@mui/icons-material/Info';
@@ -8,7 +8,8 @@ import { keyframes } from '@emotion/react';
 import { styled } from '@mui/system';
 import Layout from './Layout';
 import axios from 'axios';
-import './styles.css'
+import './styles.css';
+
 const flicker = keyframes`
   0%, 19.9%, 22%, 62.9%, 64%, 64.9%, 70%, 100% {
     opacity: 0.99;
@@ -54,8 +55,6 @@ const Header = styled('h1')`
   padding: 20px;
   margin-bottom: 20px;
 `;
-
-
 
 const PokeballButton = styled(Button)`
   position: relative;
@@ -153,6 +152,30 @@ const AddSign = styled(Typography)`
   text-align: center; 
 `;
 
+const SliderContainer = styled(Box)`
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const SliderCard = styled(Card)`
+  flex: 0 0 auto;
+  width: 150px;
+  margin-right: 1rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
 const BattlePage = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalData, setModalData] = useState(null);
@@ -162,13 +185,14 @@ const BattlePage = () => {
     const [pokemonList, setPokemonList] = useState([]);
     const [currentPokemonIndex, setCurrentPokemonIndex] = useState(0);
     const [selectedCard, setSelectedCard] = useState(null);
+    const [sliderPokemonList, setSliderPokemonList] = useState([]);
+    const sliderRef = useRef(null);
 
     useEffect(() => {
         const fetchPokemonData = async () => {
             try {
                 const response = await axios.post('https://pokegen.onrender.com/top_count');
                 setPokemonList(response.data);
-                console.log(response.data);
                 setModalData(response.data[0]);
             } catch (error) {
                 console.error('Error fetching Pokémon data:', error);
@@ -178,6 +202,36 @@ const BattlePage = () => {
         fetchPokemonData();
     }, []);
 
+    useEffect(() => {
+        const fetchSliderPokemonData = async () => {
+            try {
+                const response = await axios.post('https://pokegen.onrender.com/db_search', {}, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                setSliderPokemonList(response.data);
+            } catch (error) {
+                console.error('Error fetching slider Pokémon data:', error);
+            }
+        };
+
+        fetchSliderPokemonData();
+    }, []);
+
+    useEffect(() => {
+        const slider = sliderRef.current;
+        const scrollStep = 2;
+        const scrollInterval = setInterval(() => {
+            if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth) {
+                slider.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                slider.scrollBy({ left: scrollStep, behavior: 'smooth' });
+            }
+        }, 1);
+
+        return () => clearInterval(scrollInterval);
+    }, []);
     const handleCardClick = (pokemonKey, card) => {
         setCurrentPokemonIndex(pokemonKey);
         setModalData(pokemonList[pokemonKey]);
@@ -190,6 +244,7 @@ const BattlePage = () => {
     const toggleShowStats = () => {
         setShowStats(!showStats);
     };
+
     const handleSelect = () => {
         if (selectedCard === 1) {
             setSelectedPokemon1(modalData);
@@ -198,7 +253,6 @@ const BattlePage = () => {
         }
         handleClose();
     };
-
 
     const handlePreviousPokemon = () => {
         const previousIndex = currentPokemonIndex === 0 ? pokemonList.length - 1 : currentPokemonIndex - 1;
@@ -247,7 +301,7 @@ const BattlePage = () => {
                                 <>
                                     <Typography variant="h5" align="center">{selectedPokemon1.Pokemon}</Typography>
                                     <Box display="flex" justifyContent="center">
-                                        <img src={selectedPokemon1.image} alt={selectedPokemon1.Pokemon} style={{ width: '100%', borderRadius: 2 }} />
+                                        <img src={`data:image/png;base64,${selectedPokemon1.image_data}`} alt={selectedPokemon1.Pokemon} style={{ width: '100%', borderRadius: 2 }} />
                                     </Box>
                                 </>
                             ) : (
@@ -264,7 +318,7 @@ const BattlePage = () => {
                                 <>
                                     <Typography variant="h5" align="center">{selectedPokemon2.Pokemon}</Typography>
                                     <Box display="flex" justifyContent="center">
-                                        <img src={selectedPokemon2.image} alt={selectedPokemon2.Pokemon} style={{ width: '60%', borderRadius: 2 }} />
+                                        <img src={`data:image/png;base64,${selectedPokemon2.image_data}`} alt={selectedPokemon2.Pokemon} style={{ width: '60%', borderRadius: 2 }} />
                                     </Box>
                                 </>
                             ) : (
@@ -299,7 +353,7 @@ const BattlePage = () => {
                                     <IconButton onClick={handlePreviousPokemon}>
                                         <ArrowBackIosIcon />
                                     </IconButton>
-                                    <img src={modalData.image} alt={modalData.Pokemon} style={{ padding: 0, width: '60%', height: '50%', borderRadius: 2 }} />
+                                    <img src={`data:image/png;base64,${modalData.image_data}`} alt={modalData.Pokemon} style={{ padding: 0, width: '60%', height: '50%', borderRadius: 2 }} />
                                     <IconButton onClick={handleNextPokemon}>
                                         <ArrowForwardIosIcon />
                                     </IconButton>
@@ -314,26 +368,26 @@ const BattlePage = () => {
                                     <>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: 0.5, marginBottom: 0.5, borderBottom: '1px solid #ddd' }}>
                                             <Box sx={{ flex: 1, paddingRight: 1 }}>
-                                                <Typography variant="subtitle1" fontSize="0.90rem"><strong>HP:</strong> {modalData.HP}</Typography>
+                                                <Typography variant="subtitle1" fontSize="0.90rem"><strong>HP:</strong> {modalData["HP Base"]}</Typography>
                                             </Box>
                                             <Box sx={{ flex: 1, paddingLeft: 1 }}>
-                                                <Typography variant="subtitle1" fontSize="0.90rem"><strong>Speed:</strong> {modalData.Speed}</Typography>
+                                                <Typography variant="subtitle1" fontSize="0.90rem"><strong>Speed:</strong> {modalData["Speed Base"]}</Typography>
                                             </Box>
                                         </Box>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: 0.5, marginBottom: 0.5, borderBottom: '1px solid #ddd' }}>
                                             <Box sx={{ flex: 1, paddingRight: 1 }}>
-                                                <Typography variant="subtitle1" fontSize="0.90rem"><strong>Attack:</strong> {modalData.Attack}</Typography>
+                                                <Typography variant="subtitle1" fontSize="0.90rem"><strong>Attack:</strong> {modalData["Attack Base"]}</Typography>
                                             </Box>
                                             <Box sx={{ flex: 1, paddingLeft: 1 }}>
-                                                <Typography variant="subtitle1" fontSize="0.90rem"><strong>Defense:</strong> {modalData.Defense}</Typography>
+                                                <Typography variant="subtitle1" fontSize="0.90rem"><strong>Defense:</strong> {modalData["Defense Base"]}</Typography>
                                             </Box>
                                         </Box>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: 0.5, marginBottom: 0.5, borderBottom: '1px solid #ddd' }}>
                                             <Box sx={{ flex: 1, paddingRight: 1 }}>
-                                                <Typography variant="subtitle1" fontSize="0.90rem"><strong>Special Attack:</strong> {modalData["Special Attack"]}</Typography>
+                                                <Typography variant="subtitle1" fontSize="0.90rem"><strong>Special Attack:</strong> {modalData["Special Attack Base"]}</Typography>
                                             </Box>
                                             <Box sx={{ flex: 1, paddingLeft: 1 }}>
-                                                <Typography variant="subtitle1" fontSize="0.90rem"><strong>Special Defense:</strong> {modalData["Special Defense"]}</Typography>
+                                                <Typography variant="subtitle1" fontSize="0.90rem"><strong>Special Defense:</strong> {modalData["Special Defense Base"]}</Typography>
                                             </Box>
                                         </Box>
                                     </>
@@ -365,6 +419,17 @@ const BattlePage = () => {
                         )}
                     </Box>
                 </Modal>
+
+                <SliderContainer ref={sliderRef}>
+                    {sliderPokemonList.map((pokemon, index) => (
+                        <SliderCard key={index}>
+                            <Box display="flex" justifyContent="center">
+                                <img src={`data:image/png;base64,${pokemon["image data"]}`} alt={pokemon.metadata.Pokemon} style={{ width: '100%', borderRadius: 4 }} />
+                            </Box>
+                            <Typography variant="subtitle1" align="center" fontSize="1rem"><strong>{pokemon.metadata.Pokemon}</strong></Typography>
+                        </SliderCard>
+                    ))}
+                </SliderContainer>
             </Container>
         </Layout>
     );
